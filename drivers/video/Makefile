@@ -24,6 +24,7 @@ endif
 
 obj-${CONFIG_EXYNOS_FB} += exynos/
 obj-${CONFIG_VIDEO_ROCKCHIP} += rockchip/
+obj-${CONFIG_DRM_ROCKCHIP} += drm/
 obj-${CONFIG_VIDEO_STM32} += stm32/
 obj-${CONFIG_VIDEO_TEGRA124} += tegra124/
 obj-y += ti/
