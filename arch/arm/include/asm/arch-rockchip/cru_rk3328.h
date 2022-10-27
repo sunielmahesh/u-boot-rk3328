@@ -7,8 +7,15 @@
 #define __ASM_ARCH_CRU_RK3328_H_
 
 struct rk3328_clk_priv {
-	struct rk3328_cru *cru;
-	ulong rate;
+        struct rk3328_cru *cru;
+        ulong rate;
+        ulong cpll_hz;
+        ulong gpll_hz;
+        ulong armclk_hz;
+        ulong armclk_enter_hz;
+        ulong armclk_init_hz;
+        bool sync_kernel;
+        bool set_armclk_rate;
 };
 
 struct rk3328_cru {
@@ -42,6 +49,13 @@ struct rk3328_cru {
 	u32 sdmmc_ext_con[2];
 };
 check_member(rk3328_cru, sdmmc_ext_con[1], 0x39c);
+
+struct rk3328_clk_info {
+        unsigned long id;
+        char *name;
+        bool is_cru;
+};
+
 #define MHz		1000000
 #define KHz		1000
 #define OSC_HZ		(24 * MHz)
