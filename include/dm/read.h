@@ -30,6 +30,11 @@ static inline const struct device_node *dev_np(const struct udevice *dev)
 }
 #endif
 
+static inline bool dev_of_valid(struct udevice *dev)
+{
+        return ofnode_valid(dev_ofnode(dev));
+}
+
 #if !defined(CONFIG_DM_DEV_READ_INLINE) || CONFIG_IS_ENABLED(OF_PLATDATA)
 /**
  * dev_read_u32() - read a 32-bit integer from a device's DT property
@@ -159,6 +164,7 @@ bool dev_read_bool(const struct udevice *dev, const char *propname);
  * subnode)
  */
 ofnode dev_read_subnode(const struct udevice *dev, const char *subnode_name);
+ofnode dev_read_subnode_rk3328(const struct udevice *dev, const char *subnode_name);
 
 /**
  * dev_read_size() - read the size of a property
