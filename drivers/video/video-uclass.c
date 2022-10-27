@@ -15,6 +15,9 @@
 #include <stdio_dev.h>
 #include <video.h>
 #include <video_console.h>
+#ifdef CONFIG_DRM_ROCKCHIP
+#include <video_rockchip.h>
+#endif
 #include <asm/cache.h>
 #include <asm/global_data.h>
 #include <dm/lists.h>
@@ -92,7 +95,7 @@ static ulong alloc_fb(struct udevice *dev, ulong *addrp)
 
 	return size;
 }
-
+#if 0
 int video_reserve(ulong *addrp)
 {
 	struct udevice *dev;
@@ -117,6 +120,36 @@ int video_reserve(ulong *addrp)
 	      gd->video_top);
 
 	return 0;
+}
+#endif
+
+int video_reserve(ulong *addrp)
+{
+#ifndef CONFIG_DRM_ROCKCHIP
+        struct udevice *dev;
+#endif
+        ulong size;
+
+        gd->video_top = *addrp;
+#ifdef CONFIG_DRM_ROCKCHIP
+        size = DRM_ROCKCHIP_FB_SIZE + MEMORY_POOL_SIZE;
+        *addrp = *addrp - size;
+        *addrp &= ~((1 << 20) - 1);
+        printf("Reserving %lx Bytes for video at: %lx\n", size, *addrp);
+#else
+        for (uclass_find_first_device(UCLASS_VIDEO, &dev);
+             dev;
+             uclass_find_next_device(&dev)) {
+                size = alloc_fb(dev, addrp);
+                debug("%s: Reserving %lx bytes at %lx for video device '%s'\n",
+                      __func__, size, *addrp, dev->name);
+        }
+#endif
+        gd->video_bottom = *addrp;
+        debug("Video frame buffers from %lx to %lx\n", gd->video_bottom,
+              gd->video_top);
+
+        return 0;
 }
 
 int video_clear(struct udevice *dev)
@@ -435,9 +468,14 @@ static int video_post_bind(struct udevice *dev)
 	if (!uc_priv->video_ptr)
 		uc_priv->video_ptr = gd->video_top;
 
+	printf("gd->video_top: 0x%lx\n", gd->video_top);
+	printf("gd->video_bottom: 0x%lx\n", gd->video_bottom);
+
 	/* Allocate framebuffer space for this device */
 	addr = uc_priv->video_ptr;
 	size = alloc_fb(dev, &addr);
+	printf("addr: 0x%lx\n", addr);
+	printf("size: %lx\n", size);
 	if (addr < gd->video_bottom) {
 		/* Device tree node may need the 'u-boot,dm-pre-reloc' or
 		 * 'u-boot,dm-pre-proper' tag
@@ -446,7 +484,7 @@ static int video_post_bind(struct udevice *dev)
 		       dev->name);
 		return -ENOSPC;
 	}
-	debug("%s: Claiming %lx bytes at %lx for video device '%s'\n",
+	printf("%s: Claiming %lx bytes at %lx for video device '%s'\n",
 	      __func__, size, addr, dev->name);
 	uc_priv->video_ptr = addr;
 
