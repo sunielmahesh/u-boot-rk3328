@@ -224,6 +224,34 @@ ofnode ofnode_find_subnode(ofnode node, const char *subnode_name)
 	return subnode;
 }
 
+ofnode ofnode_find_subnode_rk3328(ofnode node, const char *subnode_name)
+{
+        ofnode subnode;
+
+        assert(ofnode_valid(node));
+        printf("%s: %s: ", __func__, subnode_name);
+
+        if (ofnode_is_np(node)) {
+                const struct device_node *np = ofnode_to_np(node);
+
+                printf("in if\n");
+                for (np = np->child; np; np = np->sibling) {
+                        if (!strcmp(subnode_name, np->name))
+                                break;
+                }
+                subnode = np_to_ofnode(np);
+        } else {
+                printf("in else\n");
+                int ooffset = fdt_subnode_offset(gd->fdt_blob,
+                                ofnode_to_offset(node), subnode_name);
+                subnode = offset_to_ofnode(ooffset);
+        }
+        printf("%s: %s\n", __func__, ofnode_valid(subnode) ?
+              ofnode_get_name(subnode) : "<none>");
+
+        return subnode;
+}
+
 int ofnode_read_u32_array(ofnode node, const char *propname,
 			  u32 *out_values, size_t sz)
 {
