@@ -185,6 +185,10 @@ __weak int misc_init_r(void)
 
 	ret = rockchip_setup_macaddr();
 
+#ifdef CONFIG_DRM_ROCKCHIP
+        rockchip_enable_display();
+#endif
+
 	return ret;
 }
 #endif
