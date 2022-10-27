@@ -338,6 +338,16 @@
 	status = "okay";
 };
 
+&display_subsystem {
+        status = "okay";
+        route {
+                route_hdmi: route-hdmi {
+                        status = "okay";
+                        connect = <&vop_out_hdmi>;
+                };
+        };
+};
+
 &tsadc {
 	status = "okay";
 };

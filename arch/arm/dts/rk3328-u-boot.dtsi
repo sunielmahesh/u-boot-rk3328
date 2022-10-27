@@ -47,6 +47,10 @@
 	u-boot,dm-pre-reloc;
 };
 
+&pinctrl {
+        u-boot,dm-pre-reloc;
+};
+
 &uart2 {
 	u-boot,dm-pre-reloc;
 	clock-frequency = <24000000>;
@@ -71,5 +75,9 @@
 };
 
 &spi0 {
+	u-boot,dm-pre-reloc;
+};
+
+&vop {
 	u-boot,dm-pre-reloc;
 };
